@@ -37,4 +37,3 @@ router.get('/summoner',async (req,res) =>{
         return res.status(400).json({message: '잠시 후 다시 시도해주세요.'});
     }
 })
-

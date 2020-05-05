@@ -9,17 +9,14 @@ router.get('/matchlist',async (req,res) =>{
     try{
         var select = `SELECT accountId FROM user WHERE JSON_EXTRACT(summoner,'$.name') = ?`;
         var result = await mysql.do(select,[summonerName]);
-        accountId = result[0].accountId
-        accountId = "\"" + accountId + "\""
-        console.log(accountId)
+        accountId = result[0].accountId;
  
-        select = "select JSON_EXTRACT(matches,'$.gameId') gameId from `match` "+
-        " WHERE JSON_CONTAINS(JSON_EXTRACT(matches,'$.participantIdentities[*].player.accountId'),?,'$')"
-        result = await mysql.do(select,[accountId])
+        select = "select matchlist from user WHERE accountId = ? ";
+        result = await mysql.do(select,[accountId]);
        
         res.setHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE");
         res.setHeader("Access-Control-Allow-Origin", "*");
-        return res.json(result)
+        return res.json(result[0].matchlist);
     }catch(e){
         return res.status(400).json({message: '잠시 후 다시 시도해주세요.'});
     }
@@ -33,7 +30,7 @@ router.get('/matches',async (req,res) =>{
         
         res.setHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE");
         res.setHeader("Access-Control-Allow-Origin", "*");
-        res = res.json(result[0]);
+        res = res.json(result[0].matches);
     }catch(e){
         return res.status(400).json({message: '잠시 후 다시 시도해주세요.'});
     }
@@ -47,7 +44,7 @@ router.get('/timelines',async (req,res) =>{
         
         res.setHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE");
         res.setHeader("Access-Control-Allow-Origin", "*");
-        res = res.json(result[0]);
+        res = res.json(result[0].timelines);
     }catch(e){
         return res.status(400).json({message: '잠시 후 다시 시도해주세요.'});
     }
