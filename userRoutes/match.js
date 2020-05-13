@@ -3,24 +3,6 @@ var mysql = require('../mysql');
 var router = express.Router();
 
 module.exports = router;
-
-router.get('/matchlist',async (req,res) =>{
-    var summonerName = req.query.summonerName;
-    try{
-        var select = `SELECT accountId FROM user WHERE JSON_EXTRACT(summoner,'$.name') = ?`;
-        var result = await mysql.do(select,[summonerName]);
-        accountId = result[0].accountId;
- 
-        select = "select matchlist from user WHERE accountId = ? ";
-        result = await mysql.do(select,[accountId]);
-       
-        res.setHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE");
-        res.setHeader("Access-Control-Allow-Origin", "*");
-        return res.json(result[0].matchlist);
-    }catch(e){
-        return res.status(400).json({message: '잠시 후 다시 시도해주세요.'});
-    }
-})
  
 router.get('/matches',async (req,res) =>{
     var gameId = req.query.gameId;
@@ -53,7 +35,8 @@ router.get('/matches/teams',async (req,res) =>{
 router.get('/matches/participantIdentities',async (req,res) =>{
     var gameId = req.query.gameId;
     try{
-        var select = "SELECT JSON_EXTRACT(matches,'$.participantIdentities') as participantIdentities FROM `match` WHERE gameId = ?";
+        var select = "SELECT JSON_EXTRACT(matches,'$.participantIdentities') as" +
+            " participantIdentities FROM `match` WHERE gameId = ?";
         var result = await mysql.do(select,[gameId]);
         
         res.setHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE");
@@ -67,7 +50,8 @@ router.get('/matches/participantIdentities',async (req,res) =>{
 router.get('/matches/participants',async (req,res) =>{
     var gameId = req.query.gameId;
     try{
-        var select = "SELECT JSON_EXTRACT(matches,'$.participants') as participants FROM `match` WHERE gameId = ?";
+        var select = "SELECT JSON_EXTRACT(matches,'$.participants') as" +
+            " participants FROM `match` WHERE gameId = ?";
         var result = await mysql.do(select,[gameId]);
         
         res.setHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE");
@@ -95,7 +79,8 @@ router.get('/timelines',async (req,res) =>{
 router.get('/timelines/frames/participantFrames',async (req,res) =>{
     var gameId = req.query.gameId;
     try{
-        var select = "SELECT JSON_EXTRACT(timelines,'$.frames[*].participantFrames') as participantFrames FROM `match` WHERE gameId = ?"
+        var select = "SELECT JSON_EXTRACT(timelines,'$.frames[*].participantFrames') as" +
+            " participantFrames FROM `match` WHERE gameId = ?"
         var result = await mysql.do(select,[gameId]);
         
         res.setHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE");
@@ -109,7 +94,8 @@ router.get('/timelines/frames/participantFrames',async (req,res) =>{
 router.get('/timelines/frames/events',async (req,res) =>{
     var gameId = req.query.gameId;
     try{
-        var select = "SELECT JSON_EXTRACT(timelines,'$.frames[*].events') as events FROM `match` WHERE gameId = ?"
+        var select = "SELECT JSON_EXTRACT(timelines,'$.frames[*].events') as" +
+        " events FROM `match` WHERE gameId = ?"
         var result = await mysql.do(select,[gameId]);
         
         res.setHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE");
