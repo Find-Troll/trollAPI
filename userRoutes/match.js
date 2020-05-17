@@ -1,6 +1,10 @@
 var express = require('express');
 var mysql = require('../mysql');
 var router = express.Router();
+const request = require("request-promise");
+
+const RIOT_API_KEY = 'RGAPI-c5c7eaa5-0cd3-401d-a9e0-8f3b564d4a9a'
+const riotUrl = 'https://kr.api.riotgames.com'
 
 module.exports = router;
  
@@ -17,6 +21,21 @@ router.get('/matches',async (req,res) =>{
         return res.status(400).json({message: '잠시 후 다시 시도해주세요.'});
     }
 })
+
+router.get('/riotMatches',async (req,res) =>{
+    var gameId = req.query.gameId;
+    try{
+        const url = `${riotUrl}/lol/match/v4/matches/${gameId}?api_key=${RIOT_API_KEY}`
+        res.setHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE");
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        const result = await request(url);
+        return res.json(result);
+        
+    }catch(e){
+        return res.status(400).json({message: '잠시 후 다시 시도해주세요.'});
+    }
+})
+
 
 router.get('/matches/teams',async (req,res) =>{
     var gameId = req.query.gameId;
