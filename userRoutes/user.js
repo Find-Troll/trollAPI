@@ -2,6 +2,7 @@ var express = require("express");
 var mysql = require("../mysql");
 const axios = require("axios");
 const cheerio = require("cheerio");
+const { spawn } = require('child_process');
 
 var router = express.Router();
 const request = require("request-promise");
@@ -198,19 +199,52 @@ router.get("/riotMatchlist", async (req, res) => {
 
 router.get("/trollScore", async (req, res) => {
   const summonerName = req.query.summonerName;
+  
   try {
     const select = "SELECT trollScore from win_rate WHERE summonerName = ?";
+    const insert = "INSERT INTO win_rate VALUES (?, NULL, ?)";
+    const update = "UPDATE win_rate SET trollScore = ? WHERE summonerName = ?";
     result = await mysql.do(select, [summonerName]);
     console.log(result);
     res.setHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE");
     res.setHeader("Access-Control-Allow-Origin", "*");
-    if (result.length != 0) return res.json(parseInt(result[0].trollScore));
+    if (result.length != 0 && result[0].trollScore !== null) return res.json(parseFloat(result[0].trollScore));
     else {
-      if (result[0].trollScore === null)
-        console.log("소환사 점수 없음", result);
-      return null;
+
+	let runPy = new Promise(function(success, nosuccess) {
+
+    		const { spawn } = require('child_process');
+    		const pyprog = spawn('python3', ['./score.py', summonerName]);
+
+    		pyprog.stdout.on('data', function(data) {
+        		success(data);
+    		});
+
+    		pyprog.stderr.on('data', (data) => {
+			console.log(data.toString());
+	       	 	nosuccess(data);
+    		});
+	});    
+
+	if (Array.isArray(result)) {
+		if(result.length === 0){
+		runPy.then(async function(fromRunpy){
+			await mysql.do(insert, [summonerName, parseFloat(fromRunpy.toString())]);
+			return res.json(parseFloat(fromRunpy.toString()));
+		})
+		.catch((e)=>{console.log(e.toString())});	
+		}
+		else{
+		runPy.then(async function(fromRunpy){
+			await mysql.do(update, [parseFloat(fromRunpy.toString()), summonerName]);
+                        return res.json(parseFloat(fromRunpy.toString()));
+                })
+		.catch((e)=>{console.log(e.toString())});
+		}
+	}
     }
   } catch (e) {
+	  console.log(e);
     return res
       .status(400)
       .json({ message: "소환사의 모든 데이터가 없습니다." });

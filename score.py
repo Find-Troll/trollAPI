@@ -1,6 +1,11 @@
 from sklearn.decomposition import PCA
 import pandas as pd
 import numpy as np
+
+def warn(*args, **kwargs):
+    pass
+import warnings
+warnings.warn = warn
 from sklearn.datasets import *
 from sklearn.cluster import *
 from sklearn.preprocessing import StandardScaler
@@ -136,7 +141,7 @@ def Troll_score():
         T_score += 50
     elif pls_troll2 == True:
         T_score += 40
-    print(T_score)
+    print(T_score, end='')
 # 소환사 이름으로 op.gg에서 crawling
 def Trim(summonerName):
     summonerName = summonerName
