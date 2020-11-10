@@ -208,10 +208,24 @@ router.get("/trollScore", async (req, res) => {
     else {
       if (result[0].trollScore === null)
         console.log("소환사 점수 없음", result);
+      return null;
     }
   } catch (e) {
     return res
       .status(400)
       .json({ message: "소환사의 모든 데이터가 없습니다." });
+  }
+});
+
+router.get("/statistics", async (req, res) => {
+  try {
+    const select = "select * from tiers";
+    result = await mysql.do(select);
+    console.log(result);
+    res.setHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE");
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.json(result);
+  } catch (e) {
+    return res.status(400).json({ message: "정보가 없습니다." });
   }
 });
