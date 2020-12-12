@@ -191,7 +191,7 @@ def Trim(summonerName):
 
 
 def foo(TROLL_NAME):
-    API_HOST = 'http://52.78.119.98:4000'
+    API_HOST = 'localhost:4000'
     most7PicksWinRate = Trim(TROLL_NAME)
     N = 30  # 게임 갯수
     M = 9  # feature 갯수
